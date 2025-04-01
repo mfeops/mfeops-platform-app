@@ -31,4 +31,4 @@ COPY --from=builder /app/package.json ./
 EXPOSE 3000
 
 # 🔟 Run the Next.js app
-CMD ["node", ".next/standalone/server.js"]
+CMD ["npm", "run" "start"]
