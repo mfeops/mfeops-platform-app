@@ -21,7 +21,7 @@ pipeline {
             steps {
                 script {
                     gitCommit = env.GIT_COMMIT?.substring(0, 8) ?: 'unknown'
-                    branchName = env.BRANCH_NAME ?: 'main'  // Lấy tên nhánh từ Jenkins
+                    branchName = env.ENVIRONMENT 
                     unixTime = (new Date().time / 1000) as Integer
                     developmentTag = "${branchName}-${gitCommit}-${unixTime}"
                 }
