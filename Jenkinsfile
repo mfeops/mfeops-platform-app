@@ -48,7 +48,7 @@ pipeline {
             steps {
                 script {
                     sh "docker push docker.io/${DOCKER_CREDENTIALS_USR}/${SERVICE}:${developmentTag}"
-                    sh "docker rmi docker.io/${DOCKER_CREDENTIALS_USR}/${SERVICE}:${developmentTag}"
+                    sh "docker rmi ${developmentTag}"
                 }
             }
         }
