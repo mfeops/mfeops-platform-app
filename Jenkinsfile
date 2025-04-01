@@ -9,37 +9,49 @@ def unixTime = ''
 def developmentTag = ''
 
 pipeline {
-    agent none
+    agent any
     environment {
         DOCKER_CREDENTIALS = credentials('docker-builder')  // Jenkins DockerHub credentials
         BUILD_USER         = 'Jenkins'
         VERSION            = 'latest'
-        // Setting on Jenkins App
-        // SERVICE            = 'platform-app'
-        // DOCKER_CREDENTIALS_USR
-        // DOCKER_CREDENTIALS_PSW
+        SERVICE            = 'platform-app'  // Định nghĩa SERVICE ở đây nếu không có trên Jenkins
     }
     stages {
-        stage("Docker Build") {
+        stage("Prepare Build Info") {
             steps {
                 script {
-                    gitCommit = env.GIT_COMMIT.substring(0,8)
-                    branchName = env.ENVIRONMENT
+                    gitCommit = env.GIT_COMMIT?.substring(0, 8) ?: 'unknown'
+                    branchName = env.BRANCH_NAME ?: 'main'  // Lấy tên nhánh từ Jenkins
                     unixTime = (new Date().time / 1000) as Integer
                     developmentTag = "${branchName}-${gitCommit}-${unixTime}"
                 }
-                sh "docker build --file Dockerfile --network=host --tag docker.io/${DOCKER_CREDENTIALS_USR}/${SERVICE}:${developmentTag} ."
+            }
+        }
+        stage("Docker Build") {
+            steps {
+                script {
+                    sh """
+                    docker build --file Dockerfile --network=host \
+                        --tag docker.io/${DOCKER_CREDENTIALS_USR}/${SERVICE}:${developmentTag} .
+                    """
+                }
             }
         }
         stage("Docker Login") {
             steps {
-               sh " echo ${DOCKER_CREDENTIALS_PSW} | docker login -u ${DOCKER_CREDENTIALS_USR} --password-stdin"
+                script {
+                    sh "echo ${DOCKER_CREDENTIALS_PSW} | docker login -u ${DOCKER_CREDENTIALS_USR} --password-stdin"
+                }
             }
         }
         stage("Docker Push") {
             steps {
-               sh "docker push docker.io/${DOCKER_CREDENTIALS_USR}/${SERVICE}:${developmentTag}"
-               sh "docker rmi docker.io/${DOCKER_CREDENTIALS_USR}/${SERVICE}:${developmentTag}"
+                script {
+                    sh """
+                    docker push docker.io/${DOCKER_CREDENTIALS_USR}/${SERVICE}:${developmentTag} || exit 1
+                    docker rmi docker.io/${DOCKER_CREDENTIALS_USR}/${SERVICE}:${developmentTag}
+                    """
+                }
             }
         }
     }
