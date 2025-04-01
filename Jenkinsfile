@@ -9,9 +9,7 @@ def unixTime = ''
 def developmentTag = ''
 
 pipeline {
-    agent {
-        label 'mfeops-builder'
-    }
+    agent none
     environment {
         DOCKER_CREDENTIALS = credentials('docker-builder')  // Jenkins DockerHub credentials
         BUILD_USER         = 'Jenkins'
