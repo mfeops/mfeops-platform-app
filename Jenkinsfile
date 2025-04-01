@@ -30,7 +30,7 @@ pipeline {
                     unixTime = (new Date().time / 1000) as Integer
                     developmentTag = "${branchName}-${gitCommit}-${unixTime}"
                 }
-                sh "docker build --file Dockerfile --network=host --tag docker.io/${DOCKER_USERNAME}/${SERVICE}:${developmentTag} ."
+                sh "docker build --file Dockerfile --network=host --tag docker.io/${DOCKER_CREDENTIALS_USR}/${SERVICE}:${developmentTag} ."
             }
         }
         stage("Docker Login") {
@@ -40,8 +40,8 @@ pipeline {
         }
         stage("Docker Push") {
             steps {
-               sh "docker push docker.io/${DOCKER_USERNAME}/${SERVICE}:${developmentTag}"
-               sh "docker rmi docker.io/${DOCKER_USERNAME}/${SERVICE}:${developmentTag}"
+               sh "docker push docker.io/${DOCKER_CREDENTIALS_USR}/${SERVICE}:${developmentTag}"
+               sh "docker rmi docker.io/${DOCKER_CREDENTIALS_USR}/${SERVICE}:${developmentTag}"
             }
         }
     }
