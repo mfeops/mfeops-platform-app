@@ -47,10 +47,8 @@ pipeline {
         stage("Docker Push") {
             steps {
                 script {
-                    sh """
-                    docker push docker.io/${DOCKER_CREDENTIALS_USR}/${SERVICE}:${developmentTag} || exit 1
-                    docker rmi docker.io/${DOCKER_CREDENTIALS_USR}/${SERVICE}:${developmentTag}
-                    """
+                    sh "docker push docker.io/${DOCKER_CREDENTIALS_USR}/${SERVICE}:${developmentTag}"
+                    sh "docker rmi docker.io/${DOCKER_CREDENTIALS_USR}/${SERVICE}:${developmentTag}"
                 }
             }
         }
